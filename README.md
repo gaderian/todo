@@ -14,4 +14,4 @@ The program should handle basic todo lists in the [todo.txt][todotxt] format.
 - [ ] Print helpful things when user tries to get help
 
 
-[todotxt]: htps://github.com/ginatrapani/todo.txt-cli/wiki/The-Todo.txt-Format
+[todotxt]: https://github.com/ginatrapani/todo.txt-cli/wiki/The-Todo.txt-Format
