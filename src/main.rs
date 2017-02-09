@@ -27,7 +27,7 @@ fn main () {
     };
 
     match arg.as_ref() {
-        "list" => list_entries(),
+        "list" => list_entries(args),
         "add" => add_entry(args),
         "filter" => filter(args),
         _ => println!("Not implemented"),
@@ -35,7 +35,7 @@ fn main () {
 }
 
 /// Prints the lines in the todo file sorted and with their linenumber.
-fn list_entries() {
+fn list_entries(mut args: env::Args) {
     let file = read_file();
     let lines: Vec<String> = BufReader::new(file).lines()
         .map(|x| x.unwrap())
@@ -51,7 +51,16 @@ fn list_entries() {
         tmp
     };
 
-    with_nr.sort_by(|a, b| a.1.cmp(&b.1));
+    let sort: bool = if let Some(a) = args.next() {
+        a != "nosort"
+    } else {
+        true
+    };
+
+    if sort {
+        with_nr.sort_by(|a, b| a.1.cmp(&b.1));
+    }
+
     for line in with_nr {
         println!("{}", line);
     }
