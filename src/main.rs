@@ -29,6 +29,7 @@ fn main () {
     match arg.as_ref() {
         "list" => list_entries(),
         "add" => add_entry(args),
+        "filter" => filter(args),
         _ => println!("Not implemented"),
     };
 }
@@ -54,6 +55,33 @@ fn list_entries() {
     for line in with_nr {
         println!("{}", line);
     }
+}
+
+fn filter(mut args: env::Args) {
+    let file = read_file();
+    let mut lines: Vec<String> = BufReader::new(file).lines()
+        .map(|x| x.unwrap())
+        .collect();
+
+    let mut with_nr = {
+        let mut tmp: Vec<ALine> = Vec::new();
+        let mut i: u32 = 1;
+        for line in lines {
+            tmp.push(ALine(i,line));
+            i=i+1;
+        }
+        tmp
+    };
+
+    for arg in args {
+        with_nr.retain(|ref a| a.1.contains(&arg[..]));
+    }
+
+    with_nr.sort_by(|a, b| a.1.cmp(&b.1));
+    for line in with_nr {
+        println!("{}", line);
+    }
+
 }
 
 /// Adds a new line to the todo file at the bottom with the specified entry
