@@ -27,10 +27,10 @@ fn main () {
     };
 
     match arg.as_ref() {
-        "list" => list_entries(args),
-        "add" => add_entry(args),
+        "list" => list_tasks(args),
+        "add" => add_task(args),
         "filter" => filter(args),
-        "rm" => remove_entries(args),
+        "rm" => remove_tasks(args),
         "done" => complete_tasks(args),
         _ => println!("Not implemented"),
     };
@@ -64,7 +64,7 @@ fn complete_tasks(args: env::Args) {
 }
 
 /// Removes any specified entries
-fn remove_entries(args: env::Args) {
+fn remove_tasks(args: env::Args) {
     let mut numbered: Vec<ALine> = numbered_lines();
 
     for arg in args {
@@ -84,7 +84,7 @@ fn remove_entries(args: env::Args) {
 
 
 /// Prints the lines in the todo file sorted and with their linenumber.
-fn list_entries(mut args: env::Args) {
+fn list_tasks(mut args: env::Args) {
     let mut numbered: Vec<ALine> = numbered_lines();
 
     let sort: bool = if let Some(a) = args.next() {
@@ -102,7 +102,7 @@ fn list_entries(mut args: env::Args) {
     }
 }
 
-/// Like list_entries but removes anything not containing the seach words
+/// Like list_tasks but removes anything not containing the seach words
 fn filter(args: env::Args) {
     let mut numbered: Vec<ALine> = numbered_lines();
 
@@ -117,8 +117,8 @@ fn filter(args: env::Args) {
 
 }
 
-/// Adds a new line to the todo file at the bottom with the specified entry
-fn add_entry(mut args: env::Args) {
+/// Adds a new line to the todo file at the bottom with the specified task
+fn add_task(mut args: env::Args) {
     let mut writer = write_file();
     let mut counter = 0;
 

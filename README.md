@@ -4,12 +4,12 @@ The program should handle basic todo lists in the [todo.txt][todotxt] format.
 
 ##Currently supported
 - [x] Adding new entries
-- [x] List the entries (sorted/unsorted)
-- [x] Filter entries on keywords
-- [x] Remove entries
+- [x] List the tasks (sorted/unsorted)
+- [x] Filter tasks on keywords
+- [x] Remove tsaks
 - [x] Mark task as done
-- [ ] Automaticly add creation date to entry
-- [ ] Automaticly add completion date to entry
+- [ ] Automaticly add creation date to new tasks
+- [ ] Automaticly add completion date to completed tasks
 - [ ] Color tags and projects when displaying list
 - [ ] Print helpful things when user tries to get help
 - [ ] Support for syncing through git
