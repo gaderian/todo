@@ -31,8 +31,36 @@ fn main () {
         "add" => add_entry(args),
         "filter" => filter(args),
         "rm" => remove_entries(args),
+        "done" => complete_tasks(args),
         _ => println!("Not implemented"),
     };
+}
+
+fn complete_tasks(args: env::Args) {
+    let mut numbered: Vec<ALine> = numbered_lines();
+    //let mut iterator = numbered.iter();
+
+    for arg in args {
+        numbered = numbered.iter()
+            .map(|x| {
+                if x.0 == str::parse::<u32>(arg.as_ref()).unwrap() {
+                    let mut new_string = String::from("x ");
+                    new_string.push_str(x.1.as_ref());
+                    ALine(x.0,new_string)
+                } else {
+                    ALine(x.0,String::from(x.1.as_ref()))
+                }
+            })
+            .collect();
+    }
+
+    let file = write_file();
+    let _ = file.set_len(0);
+    let mut writer = BufWriter::new(file);
+    for line in numbered {
+        let _ = writer.write(&line.1.as_ref());
+        let _ = writer.write(b"\n");
+    }
 }
 
 /// Removes any specified entries
