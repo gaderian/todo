@@ -12,6 +12,7 @@ The program should handle basic todo lists in the [todo.txt][todotxt] format.
 - [ ] Automaticly add completion date to entry
 - [ ] Color tags and projects when displaying list
 - [ ] Print helpful things when user tries to get help
+- [ ] Support for syncing through git
 
 
 [todotxt]: https://github.com/ginatrapani/todo.txt-cli/wiki/The-Todo.txt-Format
