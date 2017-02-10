@@ -6,7 +6,7 @@ The program should handle basic todo lists in the [todo.txt][todotxt] format.
 - [x] Adding new entries
 - [x] List the entries (sorted/unsorted)
 - [x] Filter entries on keywords
-- [ ] Remove entries
+- [x] Remove entries
 - [ ] Mark task as done
 - [ ] Automaticly add creation date to entry
 - [ ] Automaticly add completion date to entry

@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs::{File,OpenOptions};
 use std::io::prelude::*;
-use std::io::BufReader;
+use std::io::{BufReader,BufWriter};
 use std::env;
 use std::process;
 use std::fmt;
@@ -30,9 +30,43 @@ fn main () {
         "list" => list_entries(args),
         "add" => add_entry(args),
         "filter" => filter(args),
+        "rm" => remove_entries(args),
         _ => println!("Not implemented"),
     };
 }
+
+/// Removes any specified entries
+fn remove_entries(args: env::Args) {
+    let file = read_file();
+    let lines: Vec<String> = BufReader::new(file).lines()
+        .map(|x| x.unwrap())
+        .collect();
+
+    let mut with_nr = {
+        let mut tmp: Vec<ALine> = Vec::new();
+        let mut i: u32 = 1;
+        for line in lines {
+            tmp.push(ALine(i,line));
+            i=i+1;
+        }
+        tmp
+    };
+
+    for arg in args {
+        with_nr.retain(|ref a| a.0 != str::parse::<u32>(arg.as_ref()).unwrap());
+    }
+
+    // There has to be an more efficient way of doing this then to rewrite the
+    // whole file every time.
+    let file = write_file();
+    file.set_len(0);
+    let mut writer = BufWriter::new(file);
+    for line in with_nr {
+        writer.write(&line.1.as_ref());
+        writer.write(b"\n");
+    }
+}
+
 
 /// Prints the lines in the todo file sorted and with their linenumber.
 fn list_entries(mut args: env::Args) {
@@ -66,6 +100,7 @@ fn list_entries(mut args: env::Args) {
     }
 }
 
+/// Like list_entries but removes anything not containing the seach words
 fn filter(mut args: env::Args) {
     let file = read_file();
     let mut lines: Vec<String> = BufReader::new(file).lines()
