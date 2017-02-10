@@ -37,53 +37,27 @@ fn main () {
 
 /// Removes any specified entries
 fn remove_entries(args: env::Args) {
-    let file = read_file();
-    let lines: Vec<String> = BufReader::new(file).lines()
-        .map(|x| x.unwrap())
-        .collect();
-
-    let mut with_nr = {
-        let mut tmp: Vec<ALine> = Vec::new();
-        let mut i: u32 = 1;
-        for line in lines {
-            tmp.push(ALine(i,line));
-            i=i+1;
-        }
-        tmp
-    };
+    let mut numbered: Vec<ALine> = numbered_lines();
 
     for arg in args {
-        with_nr.retain(|ref a| a.0 != str::parse::<u32>(arg.as_ref()).unwrap());
+        numbered.retain(|ref a| a.0 != str::parse::<u32>(arg.as_ref()).unwrap());
     }
 
     // There has to be an more efficient way of doing this then to rewrite the
     // whole file every time.
     let file = write_file();
-    file.set_len(0);
+    let _ = file.set_len(0);
     let mut writer = BufWriter::new(file);
-    for line in with_nr {
-        writer.write(&line.1.as_ref());
-        writer.write(b"\n");
+    for line in numbered {
+        let _ = writer.write(&line.1.as_ref());
+        let _ = writer.write(b"\n");
     }
 }
 
 
 /// Prints the lines in the todo file sorted and with their linenumber.
 fn list_entries(mut args: env::Args) {
-    let file = read_file();
-    let lines: Vec<String> = BufReader::new(file).lines()
-        .map(|x| x.unwrap())
-        .collect();
-
-    let mut with_nr = {
-        let mut tmp: Vec<ALine> = Vec::new();
-        let mut i: u32 = 1;
-        for line in lines {
-            tmp.push(ALine(i,line));
-            i=i+1;
-        }
-        tmp
-    };
+    let mut numbered: Vec<ALine> = numbered_lines();
 
     let sort: bool = if let Some(a) = args.next() {
         a != "nosort"
@@ -92,37 +66,24 @@ fn list_entries(mut args: env::Args) {
     };
 
     if sort {
-        with_nr.sort_by(|a, b| a.1.cmp(&b.1));
+        numbered.sort_by(|a, b| a.1.cmp(&b.1));
     }
 
-    for line in with_nr {
+    for line in numbered {
         println!("{}", line);
     }
 }
 
 /// Like list_entries but removes anything not containing the seach words
-fn filter(mut args: env::Args) {
-    let file = read_file();
-    let mut lines: Vec<String> = BufReader::new(file).lines()
-        .map(|x| x.unwrap())
-        .collect();
-
-    let mut with_nr = {
-        let mut tmp: Vec<ALine> = Vec::new();
-        let mut i: u32 = 1;
-        for line in lines {
-            tmp.push(ALine(i,line));
-            i=i+1;
-        }
-        tmp
-    };
+fn filter(args: env::Args) {
+    let mut numbered: Vec<ALine> = numbered_lines();
 
     for arg in args {
-        with_nr.retain(|ref a| a.1.contains(&arg[..]));
+        numbered.retain(|ref a| a.1.contains(&arg[..]));
     }
 
-    with_nr.sort_by(|a, b| a.1.cmp(&b.1));
-    for line in with_nr {
+    numbered.sort_by(|a, b| a.1.cmp(&b.1));
+    for line in numbered {
         println!("{}", line);
     }
 
@@ -135,7 +96,7 @@ fn add_entry(mut args: env::Args) {
 
     while let Some(mut word) = args.next() {
         word.push('\n');
-        writer.write_all(word.as_bytes());
+        let _ = writer.write_all(word.as_bytes());
         counter+=1;
     }
     //writer.flush();
@@ -177,4 +138,20 @@ fn get_file(option: OpenOptions) -> File {
     };
 
     file
+}
+
+fn numbered_lines() -> Vec<ALine> {
+    let file = read_file();
+    let lines: Vec<String> = BufReader::new(file).lines()
+        .map(|x| x.unwrap())
+        .collect();
+
+
+    let mut tmp: Vec<ALine> = Vec::new();
+    let mut i: u32 = 1;
+    for line in lines {
+        tmp.push(ALine(i,line));
+        i=i+1;
+    }
+    tmp
 }
