@@ -47,8 +47,7 @@ fn complete_tasks(args: env::Args) {
         numbered = numbered.iter()
             .map(|x| {
                 if x.0 == str::parse::<u32>(arg.as_ref()).unwrap() {
-                    let mut new_string = String::from("x ");
-                    new_string.push_str(x.1.as_ref());
+                    let new_string = format!("x {}", x.1);
                     ALine(x.0,new_string)
                 } else {
                     ALine(x.0,String::from(x.1.as_ref()))
@@ -90,10 +89,9 @@ fn remove_tasks(args: env::Args) {
 fn list_tasks(mut args: env::Args) {
     let mut numbered: Vec<ALine> = numbered_lines();
 
-    let sort: bool = if let Some(a) = args.next() {
-        a != "nosort"
-    } else {
-        true
+    let sort: bool = match args.next() {
+        Some(a) => a != "nosort",
+        _ => true,
     };
 
     if sort {
