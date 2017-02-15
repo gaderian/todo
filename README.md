@@ -8,7 +8,7 @@ The program should handle basic todo lists in the [todo.txt][todotxt] format.
 - [x] Filter tasks on keywords
 - [x] Remove tsaks
 - [x] Mark task as done
-- [ ] Automaticly add creation date to new tasks
+- [x] Automaticly add creation date to new tasks
 - [ ] Automaticly add completion date to completed tasks
 - [ ] Color tags and projects when displaying list
 - [ ] Print helpful things when user tries to get help

@@ -1,3 +1,5 @@
+extern crate time;
+extern crate regex;
 use std::error::Error;
 use std::fs::{File,OpenOptions};
 use std::io::prelude::*;
@@ -5,6 +7,7 @@ use std::io::{BufReader,BufWriter};
 use std::env;
 use std::process;
 use std::fmt;
+use regex::Regex;
 
 struct ALine(u32,String);
 
@@ -121,15 +124,29 @@ fn filter(args: env::Args) {
 fn add_task(mut args: env::Args) {
     let mut writer = write_file();
     let mut counter = 0;
+    let pattern = Regex::new(r"^\([A-Z]\) ").unwrap();
 
-    while let Some(mut word) = args.next() {
-        word.push('\n');
-        let _ = writer.write_all(word.as_bytes());
+    let date: String = date_string();
+    while let Some(text) = args.next() {
+        let task: String;
+        if pattern.is_match(&text) {
+            task = format!("{} {}{}\n", &text[..3], date, &text[3..]);
+        } else {
+            task = format!("{} {}\n", date, text);
+        }
+        let _ = writer.write_all(task.as_bytes());
         counter+=1;
     }
     //writer.flush();
     println!("Added {} new entrie(s).", counter);
 }
+
+fn date_string() -> String {
+    let d = time::now();
+    let date = format!("{}-{:02}-{02}", 1900+d.tm_year, 1+d.tm_mon, d.tm_mday);
+    date
+}
+
 
 /// Returns a file opened for appending
 fn write_file() -> File {
