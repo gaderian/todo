@@ -7,7 +7,10 @@ use std::io::{BufReader,BufWriter};
 use std::env;
 use std::process;
 use std::fmt;
-use regex::Regex;
+use regex::{Regex,Captures};
+
+mod colorize;
+use colorize::Colorizer;
 
 struct ALine(u32,String);
 
@@ -17,6 +20,47 @@ impl fmt::Display for ALine {
     }
 }
 
+/********* TEST OF COLORING ************/
+
+struct MyColor {
+    completed: &'static str,
+    date: &'static str,
+    tag: &'static str,
+    project: &'static str,
+    line: &'static str,
+}
+
+impl Colorizer<ALine> for MyColor {
+
+    fn color(&self, s: ALine) -> String {
+        let completed = Regex::new(r"^x ").unwrap();
+        let tags = Regex::new(r" (@[^ ]+)").unwrap();
+        let proj = Regex::new(r" (\+[^ ]+)").unwrap();
+        let date = Regex::new(r"(\d{4}-\d{2}-\d{2}) ").unwrap();
+
+        if completed.is_match(&s.1) {
+            format!("{}{:02}: {}{}", self.completed, s.0, s.1, colorize::NONE)
+        } else {
+            let number = format!("{}{:02}:{}", self.line, s.0, colorize::NONE);
+
+            let task = tags.replace_all(&s.1, |cap: &Captures| {
+                format!(" {}{}{}", self.tag, &cap[1], colorize::NONE)
+            });
+
+            let task = proj.replace_all(&task, |cap: &Captures| {
+                format!(" {}{}{}", self.project, &cap[1], colorize::NONE)
+            });
+
+            let task = date.replace_all(&task, |cap: &Captures| {
+                format!("{}{}{}", self.date, &cap[1], colorize::NONE)
+            });
+
+            format!("{} {}", number, task)
+        }
+    }
+}
+
+/***************************************/
 fn main () {
     let mut args = env::args();
     match args.next() {
@@ -98,8 +142,15 @@ fn list_tasks(mut args: env::Args) {
         numbered.sort_by(|a, b| a.1.cmp(&b.1));
     }
 
+    let c = MyColor {
+        date: colorize::BLUE, 
+        completed: colorize::GREY,
+        line: colorize::GREEN, 
+        project: colorize::CYAN, 
+        tag:colorize::RED
+    };
     for line in numbered {
-        println!("{}", line);
+        println!("{}", c.color(line));
     }
 }
 
